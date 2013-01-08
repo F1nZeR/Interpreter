@@ -1,0 +1,11 @@
+﻿<Window x:Class="Interpreter.Editor.InputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ввод" Height="135" Width="265" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Label x:Name="lblInfo" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="237"/>
+        <TextBox x:Name="tbInput" HorizontalAlignment="Left" Height="23" Margin="9,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="225"/>
+        <Button Content="OK" HorizontalAlignment="Left" Margin="89,64,0,0" VerticalAlignment="Top" Width="75" Height="24" Click="ButtonClickConfirm"/>
+
+    </Grid>
+</Window>

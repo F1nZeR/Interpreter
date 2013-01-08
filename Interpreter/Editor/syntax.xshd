@@ -1,0 +1,39 @@
+﻿<SyntaxDefinition name="MySyntax"
+        xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+    <Color name="Comment" foreground="Green" />
+    <Color name="String" foreground="Brown" />
+    
+    <RuleSet>
+        <Span color="Comment" begin="//" />
+        
+        <Span color="String" multiline="true">
+            <Begin>"</Begin>
+            <End>"</End>
+        </Span>
+        
+        <Keywords fontWeight="bold" foreground="Blue"> 
+          <Word>if</Word>
+          <Word>else</Word>
+          <Word>var</Word>
+          <Word>print</Word>
+          <Word>println</Word>
+          <Word>read</Word>
+          <Word>scan</Word>
+          <Word>true</Word>
+          <Word>false</Word>
+          <Word>while</Word>
+          <Word>const</Word>
+          <Word>rand</Word>
+        </Keywords>
+        
+        <!-- цифры -->
+        <Rule foreground="DarkBlue">
+            \b0[xX][0-9a-fA-F]+  # hex
+        |    \b
+            (    \d+(\.[0-9]+)?   # точка
+            |    \.[0-9]+         # начало с точки
+            )
+            ([eE][+-]?[0-9]+)?
+        </Rule>
+    </RuleSet>
+</SyntaxDefinition>
