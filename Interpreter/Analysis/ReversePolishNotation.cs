@@ -10,6 +10,7 @@ namespace Interpreter.Analysis
     public class ReversePolishNotation
     {
         private readonly Stack<Lexem> Stack = new Stack<Lexem>();
+        private readonly Stack<Tuple<Lexem, Lexem>> _increaseStack = new Stack<Tuple<Lexem, Lexem>>();
         private readonly Stack<int> _whilePoses = new Stack<int>();
 
         private readonly List<Lexem> Output = new List<Lexem>();
@@ -49,15 +50,26 @@ namespace Interpreter.Analysis
                         break;
 
                     case LexemType.Operator:
+                        if (lexem.Content.Equals("]"))
+                        {
+                            var a = Stack.Peek();
+                            while (Stack.Peek().LexemType != LexemType.LeftBrace)
+                                Output.Add(Stack.Pop());
+
+                            if (Stack.Peek().LexemType == LexemType.LeftBrace)
+                                Stack.Pop();
+
+                            if (Stack.Count > 0 && Stack.Peek().Content.Equals("var")) Output.Add(Stack.Pop());
+                            Output.Add(lexem);
+                            break;
+                        }
                         while (Stack.Count > 0 && Priority(Stack.Peek().Content.ToString()) >= Priority(lexem.Content.ToString()))
                             Output.Add(Stack.Pop());
                         Stack.Push(lexem);
                         break;
 
                     case LexemType.LeftBracket:
-                        Stack.Push(lexem);
-                        break;
-
+                    case LexemType.LeftBrace:
                     case LexemType.Function:
                         Stack.Push(lexem);
                         break;
@@ -213,7 +225,19 @@ namespace Interpreter.Analysis
 
                 if (lex.LexemType == LexemType.Operator)
                 {
-                    if (lex.Content.ToString() == "var")
+                    if (lex.Content.Equals("++") || lex.Content.Equals("--"))
+                    {
+                        try
+                        {
+                            _increaseStack.Push(new Tuple<Lexem, Lexem>(Stack.Peek(), lex));
+                            continue;
+                        }
+                        catch (Exception)
+                        {
+                            throw new SyntaxException("Ошибка выполнения операции " + lex.Content, lex);
+                        }
+                    }
+                    else if (lex.Content.Equals("var"))
                     {
                         Lexem lexVar;
                         try
@@ -272,6 +296,18 @@ namespace Interpreter.Analysis
 
                 if (lex.LexemType == LexemType.EndOfExpr)
                 {
+                    while (_increaseStack.Count > 0)
+                    {
+                        var tuple = _increaseStack.Pop();
+                        if (tuple.Item2.Content.Equals("++"))
+                        {
+                            Storage.SetVariableValue(tuple.Item1, tuple.Item1.ToDouble() + 1);
+                        }
+                        else
+                        {
+                            Storage.SetVariableValue(tuple.Item1, tuple.Item1.ToDouble() - 1);
+                        }
+                    }
                     Stack.Clear();
                     return;
                 }
@@ -343,6 +379,7 @@ namespace Interpreter.Analysis
         {
             oper = oper.Trim();
 
+            if (oper.Equals("++") || oper.Equals("--")) return 8;
             if (oper.Equals("var")) return 7;
             if (oper.Equals("]")) return 6;
             if (oper.Equals("*") || oper.Equals("/")) return 5;

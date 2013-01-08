@@ -16,11 +16,11 @@ namespace Interpreter.Analysis
                                               };
         private readonly List<string> _lexemStrings = new List<string>
                 {
-                    "+", "-", "*", "/", "=", ")", "(", ";", "\"", "!", "{", "}", "|", "&", "]", ","
+                    "+", "-", "*", "/", "=", ")", "(", ";", "\"", "!", "{", "}", "|", "&", "]", ",", "["
                 };
         private readonly List<string> _operators = new List<string>
                                                       {
-                                                          "+", "-", "*", "/", "=", "]"
+                                                          "+", "-", "*", "/", "=", "]", "++", "--"
                                                       };
         private readonly List<string> _specWords = new List<string>
                                                        {
@@ -87,7 +87,8 @@ namespace Interpreter.Analysis
                 else if (_lexemStrings.Contains(_input[index].ToString())) // операторы
                 {
                     current += _input[index++];
-                    if (current == "/" && _input[index] == '/')
+
+                    if (current == "/" && _input[index] == '/') // комментарий
                     {
                         while (_input[index] != '\n')
                         {
@@ -98,7 +99,8 @@ namespace Interpreter.Analysis
                     }
 
                     if (((current == "=" || current == ">" || current == "<" || current == "!") && _input[index] == '=') ||
-                        (current == "|" && _input[index] == '|') || (current == "&" && _input[index] == '&'))
+                        (current == "|" && _input[index] == '|') || (current == "&" && _input[index] == '&') || 
+                        (current == "+" && _input[index] == '+') || (current == "-" && _input[index] == '-'))
                     {
                         current += _input[index++];
                     }
@@ -160,6 +162,7 @@ namespace Interpreter.Analysis
             }
 
             if (lexem.Equals("(")) return LexemType.LeftBracket;
+            if (lexem.Equals("[")) return LexemType.LeftBrace;
             if (lexem.Equals(")")) return LexemType.RightBracket;
             if (lexem.Equals(";")) return LexemType.EndOfExpr;
             if (lexem.Equals("\"")) return LexemType.StringSplitter;

@@ -114,5 +114,11 @@ namespace Interpreter
                 textEditor.Text = File.OpenText(ofd.FileName).ReadToEnd();
             }
         }
+
+        private void Clear(object sender, RoutedEventArgs e)
+        {
+            ClearErrors();
+            textEditor.Clear();
+        }
     }
 }

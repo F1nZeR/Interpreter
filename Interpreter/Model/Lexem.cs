@@ -19,6 +19,7 @@ namespace Interpreter.Model
         Boolean,
         SpecialWord,
         Brace,
+        LeftBrace,
         ModificatorCandidate,
         Modificator
     }

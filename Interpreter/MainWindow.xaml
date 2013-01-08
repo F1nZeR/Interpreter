@@ -31,6 +31,9 @@
             <Button Click="OpenFile" >
                 <Image Source="Images/Open.png" Height="16"/>
             </Button>
+            <Button Click="Clear">
+                <Image Source="Images/Clear.png" Height="16"/>
+            </Button>
             <Separator/>
             <Button Command="Cut">
                 <Image Source="Images/Cut.png" Height="16"/>
