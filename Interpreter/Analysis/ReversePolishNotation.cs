@@ -192,7 +192,7 @@ namespace Interpreter.Analysis
                         }
                         else
                         {
-                            if (_ifStateLevel == 0)
+                            if (_ifStateLevel == 0 && _whilePoses.Count > 0)
                             {
                                 isTaken = true;
                                 _stToLex.currentPosition = _whilePoses.Pop();
