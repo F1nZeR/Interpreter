@@ -94,7 +94,7 @@ namespace Interpreter.Utilities
                 }
             }
 
-            throw new SyntaxException("Неудалось определить общий тип", leftValue);
+            throw new SyntaxException("Не удалось определить общий тип", leftValue);
         }
 
         public static object Calculate(Lexem oper, Lexem leftValue, Lexem rightValue, ref LexemType lt)

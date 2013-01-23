@@ -59,23 +59,29 @@ namespace Interpreter.Analysis
                 index = currentPosition;
                 if (index >= _input.Length) break;
 
-                if (_prevLexem.LexemType == LexemType.StringSplitter) // строка "text"
+                if (Char.IsDigit(_input[index])) // числа 12345
                 {
-                    while (_input[index] != '\"')
+                    while (Char.IsLetterOrDigit(_input[index]) || _input[index] == '.')
                     {
+                        if (Char.IsLetter(_input[index]))
+                        {
+                            var errLexem = new Lexem(current + _input[index], LexemType.None, currentPosition);
+                            throw new SyntaxException("Введено некорректное число", errLexem);
+                        }
                         current += _input[index++];
                     }
-                    index++;
-                    customLexem = LexemType.String;
-                }
-                else if (Char.IsDigit(_input[index])) // числа 12345
-                {
-                    while (Char.IsDigit(_input[index]) || _input[index] == '.')
+                    if (!_lexemStrings.Contains(_input[index].ToString()) && _input[index] != '\r' &&
+                        _input[index] != '\n' && _input[index] != ' ')
                     {
-                        current += _input[index++];
+                        var errLex = new Lexem(current + _input[index], LexemType.None, currentPosition);
+                        throw new SyntaxException("Введено некорректное число", errLex);
                     }
                     current = current.Replace('.', ',');
-                    if (current.Count(x => x == ',') > 1) throw new Exception("Введено некорректное число");
+                    if (current.Count(x => x == ',') > 1)
+                    {
+                        var errLexem = new Lexem(current, LexemType.None, currentPosition);
+                        throw new SyntaxException("Введено некорректное число", errLexem);
+                    }
                 }
                 else if (Char.IsLetter(_input[index]) || _input[index] == '_') // служебные слова, VAR, print
                 {
@@ -83,12 +89,28 @@ namespace Interpreter.Analysis
                     {
                         current += _input[index++];
                     }
+                    if (!_lexemStrings.Contains(_input[index].ToString()) && _input[index] != '\r' &&
+                        _input[index] != '\n' && _input[index] != ' ')
+                    {
+                        var errLex = new Lexem(_input[index].ToString(), LexemType.None, index);
+                        throw new SyntaxException("Неверная лексема", errLex);
+                    }
                 }
                 else if (_lexemStrings.Contains(_input[index].ToString())) // операторы
                 {
                     current += _input[index++];
-
-                    if (current == "/" && _input[index] == '/') // комментарий
+                    
+                    if (current == "\"")
+                    {
+                        current = string.Empty;
+                        while (_input[index] != '\"')
+                        {
+                            current += _input[index++];
+                        }
+                        index++;
+                        customLexem = LexemType.String;
+                    }
+                    else if (current == "/" && _input[index] == '/') // комментарий
                     {
                         while (_input[index] != '\n')
                         {
@@ -97,12 +119,20 @@ namespace Interpreter.Analysis
                         currentPosition = index;
                         continue;
                     }
-
-                    if (((current == "=" || current == ">" || current == "<" || current == "!") && _input[index] == '=') ||
+                    else if (((current == "=" || current == ">" || current == "<" || current == "!") && _input[index] == '=') ||
                         (current == "|" && _input[index] == '|') || (current == "&" && _input[index] == '&') || 
                         (current == "+" && _input[index] == '+') || (current == "-" && _input[index] == '-'))
                     {
                         current += _input[index++];
+                    }
+
+                    var next = _input[index];
+                    if (current == "!" || current == "|" || current == "&" || !_lexemStrings.Contains(next.ToString()) && 
+                        next != '\r' && next != '\n' && !Char.IsLetterOrDigit(next) && next != ' ' &&
+                        (current != "=" || current != ">" || current != "<" || current != "+" || current != "-"))
+                    {
+                        var errLex = new Lexem(current + next, LexemType.None, currentPosition);
+                        throw new SyntaxException("Введён некорректный оператор", errLex);
                     }
                 }
                 else // ненужные символы
@@ -165,7 +195,6 @@ namespace Interpreter.Analysis
             if (lexem.Equals("[")) return LexemType.LeftBrace;
             if (lexem.Equals(")")) return LexemType.RightBracket;
             if (lexem.Equals(";")) return LexemType.EndOfExpr;
-            if (lexem.Equals("\"")) return LexemType.StringSplitter;
             if (lexem.Equals("{") || lexem.Equals("}")) return LexemType.Brace;
             if (lexem.Equals("const")) return LexemType.ModificatorCandidate;
             if (lexem.Equals("var"))

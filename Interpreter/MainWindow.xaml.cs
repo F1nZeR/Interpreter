@@ -48,7 +48,7 @@ namespace Interpreter
 
             tbOutput.Clear();
             var exprParser = new ReversePolishNotation();
-            var text = textEditor.Text + "\n";
+            var text = textEditor.Text + "\r\n";
 
             try
             {

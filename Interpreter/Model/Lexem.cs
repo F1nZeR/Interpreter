@@ -15,7 +15,6 @@ namespace Interpreter.Model
         RightBracket,
         EndOfExpr,
         String,
-        StringSplitter,
         Boolean,
         SpecialWord,
         Brace,
